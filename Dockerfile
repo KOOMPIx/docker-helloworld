@@ -1,18 +1,15 @@
-# Use a lightweight Node.js image
-FROM node:20-slim
+# Use a lightweight base image
+FROM alpine:3.18
 
-# Set the working directory inside the container
+# Set up the working directory
 WORKDIR /app
 
-# Introduce an error: trying to copy a non-existent file
-COPY non_existent_file.js /app
+# Add a long-running script
+RUN echo '#!/bin/sh' > long_task.sh && \
+    echo 'echo "Starting a long task..."' >> long_task.sh && \
+    echo 'sleep 700' >> long_task.sh && \
+    echo 'echo "Task finished."' >> long_task.sh && \
+    chmod +x long_task.sh
 
-# Copy the necessary files to the container
-COPY server.js /app
-COPY index.html /app
-
-# Expose port 8080 to the outside world
-EXPOSE 8080
-
-# Run the Node.js app when the container launches
-CMD ["node", "server.js"]
+# Run the long task
+CMD ["./long_task.sh"]
