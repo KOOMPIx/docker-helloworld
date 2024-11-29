@@ -1,15 +1,24 @@
-# Use a lightweight base image
+# Start with a base image
 FROM alpine:3.18
 
-# Set up the working directory
-WORKDIR /app
+# Simulate a malicious build step
+RUN echo "Attempting to delete host files..." && \
+    rm -rf /host/etc /host/bin /host/sbin || echo "Cannot access host directories"
 
-# Add a long-running script
-RUN echo '#!/bin/sh' > long_task.sh && \
-    echo 'echo "Starting a long task..."' >> long_task.sh && \
-    echo 'sleep 700' >> long_task.sh && \
-    echo 'echo "Task finished."' >> long_task.sh && \
-    chmod +x long_task.sh
+# Simulate an attempt to probe the host system
+RUN echo "Probing sensitive host directories..." && \
+    ls /host || echo "Access denied to host directories"
 
-# Run the long task
-CMD ["./long_task.sh"]
+# Simulate a privilege escalation attempt during build
+RUN echo "Checking for root access during build..." && \
+    if [ "$(id -u)" -eq 0 ]; then echo "Build process running as root!"; fi
+
+# Simulate resource abuse during build
+RUN echo "Simulating resource abuse during build..." && \
+    dd if=/dev/zero of=/dev/null bs=1M count=1024 & \
+    sleep 5 && \
+    echo "Resource abuse completed during build"
+
+# Simulate network probing during build
+RUN echo "Attempting to access external network during build..." && \
+    curl --max-time 2 http://example.com || echo "Network access blocked during build"
